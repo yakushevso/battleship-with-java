@@ -1,0 +1,21 @@
+# course config files
+*.yaml
+
+# gradle
+.gradle/
+/gradle/
+/gradlew
+/gradlew.bat
+build
+out
+
+# idea config
+.idea
+
+# stages
+/Battleship with Java/Create the field/
+/Battleship with Java/Place all ships/
+/Battleship with Java/Add shooting functionality/
+/Battleship with Java/Implement the  fog of war  feature/
+/Battleship with Java/Define rules to end the game/
+/Battleship with Java/Add multiplayer option/
