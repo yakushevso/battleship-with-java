@@ -4,14 +4,17 @@ import java.util.*;
 
 public class Field {
     private char[][] field;
+    private char[][] copyField;
     private final static int FIELD_SIZE = 10;
     private final static String LETTERS = "ABCDEFGHIJ";
     private static final char FOG = '~';
     private static final char SHIP = 'O';
+    private static final char HIT = 'X';
+    private static final char MISS = 'M';
 
-    final Scanner sc = new Scanner(System.in);
+    private final Scanner sc = new Scanner(System.in);
 
-    public void initial() {
+    public void clearField() {
         field = new char[FIELD_SIZE][FIELD_SIZE];
         for (char[] chars : field) {
             Arrays.fill(chars, FOG);
@@ -31,12 +34,17 @@ public class Field {
     }
 
     public void placeShip(Ship ship) {
-        System.out.printf(Messages.ENTER_SHIP.toString(), ship.getName(), ship.getLength());
-
         while (true) {
-            int[][] coordinate = getCoordinates();
+            int[][] coordinate;
 
-            if (isValidPlaceShip(coordinate, ship)) {
+            try {
+                coordinate = getCoordinates();
+            } catch (NumberFormatException e) {
+                System.out.println(Messages.ERROR_INPUT);
+                continue;
+            }
+
+            if (isPossibleToPlaceShip(coordinate, ship)) {
                 for (int i = coordinate[0][0] - 1; i <= coordinate[1][0] - 1; i++) {
                     for (int j = coordinate[0][1] - 1; j <= coordinate[1][1] - 1; j++) {
                         field[i][j] = SHIP;
@@ -47,8 +55,17 @@ public class Field {
         }
     }
 
-    public boolean isValidPlaceShip(int[][] coordinate, Ship ship) {
-        if (coordinate[0][0] < 1 || coordinate[0][0] > 10 || coordinate[1][0] < 1 || coordinate[1][0] > 10) {
+    public boolean isValidCoordinate(int[] coordinate) {
+        if (coordinate[0] < 1 || coordinate[0] > 10 || coordinate[1] < 1 || coordinate[1] > 10) {
+            System.out.println(Messages.ERROR_INPUT);
+            return false;
+        }
+        return true;
+    }
+
+    public boolean isPossibleToPlaceShip(int[][] coordinate, Ship ship) {
+        if (coordinate[0][0] < 1 || coordinate[0][0] > 10 || coordinate[1][0] < 1 || coordinate[1][0] > 10 ||
+                coordinate[0][1] < 1 || coordinate[0][1] > 10 || coordinate[1][1] < 1 || coordinate[1][1] > 10) {
             System.out.println(Messages.ERROR_INPUT);
             return false;
         } else if (coordinate[0][0] != coordinate[1][0] && coordinate[0][1] != coordinate[1][1]) {
@@ -73,6 +90,34 @@ public class Field {
         return true;
     }
 
+    public void takeShot() {
+        while (true) {
+            int[] coordinate;
+
+            try {
+                coordinate = stringToCoordinates(sc.next());
+            } catch (NumberFormatException e) {
+                System.out.println(Messages.ERROR_INPUT);
+                continue;
+            }
+
+            if (isValidCoordinate(coordinate)) {
+                if (copyField[coordinate[0] - 1][coordinate[1] - 1] == SHIP) {
+                    field[coordinate[0] - 1][coordinate[1] - 1] = HIT;
+                    copyField[coordinate[0] - 1][coordinate[1] - 1] = HIT;
+                    printField();
+                    System.out.println(Messages.HIT);
+                } else if (copyField[coordinate[0] - 1][coordinate[1] - 1] == FOG) {
+                    field[coordinate[0] - 1][coordinate[1] - 1] = MISS;
+                    copyField[coordinate[0] - 1][coordinate[1] - 1] = MISS;
+                    printField();
+                    System.out.println(Messages.MISS);
+                }
+                break;
+            }
+        }
+    }
+
     public int[][] getCoordinates() {
         int[] c1 = stringToCoordinates(sc.next());
         int[] c2 = stringToCoordinates(sc.next());
@@ -88,5 +133,13 @@ public class Field {
         int first = LETTERS.indexOf(s.toUpperCase().charAt(0)) + 1;
         int second = Integer.parseInt(s.substring(1));
         return new int[]{first, second};
+    }
+
+    public void setCopyField() {
+        copyField = field;
+    }
+
+    public void setField() {
+        field = copyField;
     }
 }
