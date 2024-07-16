@@ -16,14 +16,25 @@ public class Game {
 
         System.out.println(Messages.TAKE_SHOT);
 
-        switch (field.takeShot()) {
-            case HIT -> {
-                field.printField(field.getFogField());
-                System.out.println(Messages.HIT);
-            }
-            case MISS -> {
-                field.printField(field.getFogField());
-                System.out.println(Messages.MISS);
+        int count = 0;
+        while (count < 5) {
+            switch (field.takeShot()) {
+                case HIT -> {
+                    field.printField(field.getFogField());
+                    System.out.println(Messages.HIT);
+                }
+                case MISS -> {
+                    field.printField(field.getFogField());
+                    System.out.println(Messages.MISS);
+                }
+                case SANK -> {
+                    field.printField(field.getFogField());
+                    if (++count == 5) {
+                        System.out.println(Messages.WON);
+                    } else {
+                        System.out.println(Messages.SANK);
+                    }
+                }
             }
         }
 
