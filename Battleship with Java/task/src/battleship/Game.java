@@ -1,43 +1,50 @@
 package battleship;
 
-public class Game {
-    public void run() {
-        Field field = new Field();
-        field.printField(field.getField());
+import java.util.Scanner;
 
-        for (Ship ship : Ship.values()) {
-            System.out.printf(Messages.ENTER_SHIP.toString(), ship.getName(), ship.getLength());
-            field.placeShip(ship);
-            field.printField(field.getField());
-        }
+public class Game {
+    private final Scanner sc = new Scanner(System.in);
+
+    public void run() {
+        Player player1 = new Player("Player 1");
+        Player player2 = new Player("Player 2");
+
+        initializePlayer(player1);
+        initializePlayer(player2);
 
         System.out.println(Messages.GAME_STARTS);
-        field.printField(field.getFogField());
-
         System.out.println(Messages.TAKE_SHOT);
 
-        int count = 0;
-        while (count < 5) {
-            switch (field.takeShot()) {
-                case HIT -> {
-                    field.printField(field.getFogField());
-                    System.out.println(Messages.HIT);
-                }
-                case MISS -> {
-                    field.printField(field.getFogField());
-                    System.out.println(Messages.MISS);
-                }
-                case SANK -> {
-                    field.printField(field.getFogField());
-                    if (++count == 5) {
-                        System.out.println(Messages.WON);
-                    } else {
-                        System.out.println(Messages.SANK);
-                    }
-                }
-            }
+        while (true) {
+            if (playTurn(player1, player2)) break;
+            if (playTurn(player2, player1)) break;
+        }
+    }
+
+    private void initializePlayer(Player player) {
+        System.out.printf(Messages.PLAYER.toString(), player.getName());
+        player.getField().init();
+        player.getField().print(false);
+        player.getField().placeShips();
+        changeTurn();
+    }
+
+    private boolean playTurn(Player currentPlayer, Player opponentPlayer) {
+        opponentPlayer.getField().print(true);
+        System.out.println("---------------------");
+        currentPlayer.getField().print(false);
+        System.out.printf(Messages.TURN.toString(), currentPlayer.getName());
+
+        if (opponentPlayer.getField().takeShot()) {
+            return true;
         }
 
-        field.printField(field.getField());
+        changeTurn();
+        return false;
+    }
+
+    private void changeTurn() {
+        System.out.println(Messages.ENTER);
+        sc.nextLine();
     }
 }
